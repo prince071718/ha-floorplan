@@ -43,6 +43,19 @@ If you prefer to host it locally:
 
 ---
 
+## 🎮 Dashboard Setup
+
+Once the resource is added (via Installation steps above):
+
+1. Go to your Home Assistant Dashboard.
+2. Click the **Pencil icon** (Edit Dashboard) > **Add Card**.
+3. Scroll down and select **Manual**.
+4. **Copy the YAML** exported from the Visual Editor.
+5. **Paste** it into the Manual Card configuration.
+6. Click **Save**.
+
+---
+
 ## 💻 Local Development
 
 1. **Install Dependencies**:
