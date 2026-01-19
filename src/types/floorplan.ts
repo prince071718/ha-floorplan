@@ -1,4 +1,4 @@
-export type EntityType = 'light' | 'media_player';
+export type EntityType = 'light' | 'media_player' | 'camera';
 export type EntityShape = 'circle' | 'square' | 'rect' | 'custom';
 
 export interface EntityStyle {

@@ -121,118 +121,143 @@ function onTouchEnd() {
 
 
 
-// Label Drag Logic
-function onLabelMouseDown(event: MouseEvent) {
-    event.stopPropagation(); // Don't drag entity
-    isLabelDragging.value = true;
-    labelDragStart.value = { x: event.clientX, y: event.clientY };
-    window.addEventListener('mousemove', onLabelMouseMove);
-    window.addEventListener('mouseup', onLabelMouseUp);
-}
+    // Label Drag Logic
+    const labelRef = ref<HTMLElement | null>(null);
 
-function onLabelMouseMove(event: MouseEvent) {
-    if (!isLabelDragging.value) return;
-    const dx = event.clientX - labelDragStart.value.x;
-    const dy = event.clientY - labelDragStart.value.y;
+    function onLabelMouseDown(event: MouseEvent) {
+        event.stopPropagation(); // Don't drag entity
+        store.selectedEntityId = props.entity.id;
+        isLabelDragging.value = true;
+        labelDragStart.value = { x: event.clientX, y: event.clientY };
+        window.addEventListener('mousemove', onLabelMouseMove);
+        window.addEventListener('mouseup', onLabelMouseUp);
+    }
+
+    function onLabelMouseMove(event: MouseEvent) {
+        if (!isLabelDragging.value || !labelRef.value) return;
+        
+        const dx = event.clientX - labelDragStart.value.x;
+        const dy = event.clientY - labelDragStart.value.y;
+        
+        // Calculate percentage change based on LABEL dimensions
+        const rect = labelRef.value.getBoundingClientRect();
+        const width = rect.width;
+        const height = rect.height;
+        
+        if (width === 0 || height === 0) return;
+
+        const dxPercent = (dx / width) * 100;
+        const dyPercent = (dy / height) * 100;
+
+        // Update labelConfig offset
+        const currentConfig = props.entity.labelConfig;
+        store.updateEntity(props.entity.id, {
+            labelConfig: {
+                ...currentConfig,
+                offsetX: (currentConfig.offsetX || 0) + dxPercent,
+                offsetY: (currentConfig.offsetY || 0) + dyPercent
+            }
+        });
+
+        labelDragStart.value = { x: event.clientX, y: event.clientY };
+    }
+
+    function onLabelMouseUp() {
+        isLabelDragging.value = false;
+        window.removeEventListener('mousemove', onLabelMouseMove);
+        window.removeEventListener('mouseup', onLabelMouseUp);
+    }
+
+    function onLabelTouchStart(event: TouchEvent) {
+        event.stopPropagation();
+        store.selectedEntityId = props.entity.id;
+        const touch = event.touches[0];
+        if (!touch) return;
+        
+        isLabelDragging.value = true;
+        labelDragStart.value = { x: touch.clientX, y: touch.clientY };
+        window.addEventListener('touchmove', onLabelTouchMove, { passive: false });
+        window.addEventListener('touchend', onLabelTouchEnd);
+    }
+
+    function onLabelTouchMove(event: TouchEvent) {
+        if (!isLabelDragging.value || !labelRef.value) return;
+        event.preventDefault(); 
+        const touch = event.touches[0];
+        if (!touch) return;
+
+        const dx = touch.clientX - labelDragStart.value.x;
+        const dy = touch.clientY - labelDragStart.value.y;
+
+        const rect = labelRef.value.getBoundingClientRect();
+        const width = rect.width;
+        const height = rect.height;
+
+        if (width === 0 || height === 0) return;
+
+        const dxPercent = (dx / width) * 100;
+        const dyPercent = (dy / height) * 100;
+
+        const currentConfig = props.entity.labelConfig;
+        store.updateEntity(props.entity.id, {
+            labelConfig: {
+                ...currentConfig,
+                offsetX: (currentConfig.offsetX || 0) + dxPercent,
+                offsetY: (currentConfig.offsetY || 0) + dyPercent
+            }
+        });
+
+        labelDragStart.value = { x: touch.clientX, y: touch.clientY };
+    }
+
+    function onLabelTouchEnd() {
+        isLabelDragging.value = false;
+        window.removeEventListener('touchmove', onLabelTouchMove);
+        window.removeEventListener('touchend', onLabelTouchEnd);
+    }
+
+    // Style computation
+    const styleObject = computed(() => {
+    const { shape, style, x, y } = props.entity;
     
-    // Update labelConfig offset
-    const currentConfig = props.entity.labelConfig;
-    store.updateEntity(props.entity.id, {
-        labelConfig: {
-            ...currentConfig,
-            offsetX: (currentConfig.offsetX || 0) + dx,
-            offsetY: (currentConfig.offsetY || 0) + dy
-        }
-    });
-
-    labelDragStart.value = { x: event.clientX, y: event.clientY };
-}
-
-function onLabelMouseUp() {
-    isLabelDragging.value = false;
-    window.removeEventListener('mousemove', onLabelMouseMove);
-    window.removeEventListener('mouseup', onLabelMouseUp);
-}
-
-function onLabelTouchStart(event: TouchEvent) {
-    event.stopPropagation();
-    const touch = event.touches[0];
-    if (!touch) return;
-    
-    isLabelDragging.value = true;
-    labelDragStart.value = { x: touch.clientX, y: touch.clientY };
-    window.addEventListener('touchmove', onLabelTouchMove, { passive: false });
-    window.addEventListener('touchend', onLabelTouchEnd);
-}
-
-function onLabelTouchMove(event: TouchEvent) {
-    if (!isLabelDragging.value) return;
-    event.preventDefault(); 
-    const touch = event.touches[0];
-    if (!touch) return;
-
-    const dx = touch.clientX - labelDragStart.value.x;
-    const dy = touch.clientY - labelDragStart.value.y;
-
-    const currentConfig = props.entity.labelConfig;
-    store.updateEntity(props.entity.id, {
-        labelConfig: {
-            ...currentConfig,
-            offsetX: (currentConfig.offsetX || 0) + dx,
-            offsetY: (currentConfig.offsetY || 0) + dy
-        }
-    });
-
-    labelDragStart.value = { x: touch.clientX, y: touch.clientY };
-}
-
-function onLabelTouchEnd() {
-    isLabelDragging.value = false;
-    window.removeEventListener('touchmove', onLabelTouchMove);
-    window.removeEventListener('touchend', onLabelTouchEnd);
-}
-
-// Style computation
-const styleObject = computed(() => {
-  const { shape, style, x, y } = props.entity;
-  
-  const baseStyle: Record<string, any> = {
-    left: `${x}%`,
-    top: `${y}%`,
-    width: `${style.width}%`,
-    height: `${style.height}%`,
-    backgroundColor: style.offColor,
-    opacity: style.offOpacity,
-    transform: `translate(-50%, -50%) rotate(${style.rotation}deg)`,
-    position: 'absolute' as const,
-    border: isSelected.value ? '2px solid var(--color-primary)' : '2px solid transparent',
-    borderRadius: shape === 'circle' ? '50%' : '4px', // default for square/rect
-    cursor: 'move',
-    zIndex: isSelected.value ? 10 : 1
-  };
-  
-  if (shape === 'square') {
-      // For square we might want aspect ratio lock, but here w/h are % of parent.
-      // If we want a true square, it's tricky with % unless parent is square.
-      // We will stick to w/h percentages for now.
-  }
-  
-  return baseStyle;
-});
-
-const labelStyle = computed(() => {
-    const { offsetX, offsetY, color, fontSize } = props.entity.labelConfig || {};
-    return {
-        transform: `translate(calc(-50% + ${offsetX || 0}px), calc(-50% + ${offsetY || 0}px))`,
-        color: color || '#ffffff',
-        fontSize: `${fontSize || 14}px`
+    const baseStyle: Record<string, any> = {
+        left: `${x}%`,
+        top: `${y}%`,
+        width: `${style.width}%`,
+        height: `${style.height}%`,
+        backgroundColor: style.offColor,
+        opacity: style.offOpacity,
+        transform: `translate(-50%, -50%) rotate(${style.rotation}deg)`,
+        position: 'absolute' as const,
+        border: isSelected.value ? '2px solid var(--color-primary)' : '2px solid transparent',
+        borderRadius: shape === 'circle' ? '50%' : '4px', // default for square/rect
+        cursor: 'move',
+        zIndex: isSelected.value ? 10 : 1
     };
-});
+    
+    if (shape === 'square') {
+        // For square we might want aspect ratio lock, but here w/h are % of parent.
+        // If we want a true square, it's tricky with % unless parent is square.
+        // We will stick to w/h percentages for now.
+    }
+    
+    return baseStyle;
+    });
+
+    const labelStyle = computed(() => {
+        const { offsetX, offsetY, color, fontSize } = props.entity.labelConfig || {};
+        return {
+            transform: `translate(-50%, -50%) translate(${offsetX || 0}%, ${offsetY || 0}%)`,
+            color: color || '#ffffff',
+            fontSize: `${fontSize || 14}px`
+        };
+    });
 
 </script>
 
 <template>
   <div 
+    ref="overlayRef"
     class="entity-overlay" 
     :style="styleObject"
     @mousedown="onMouseDown"
@@ -242,6 +267,7 @@ const labelStyle = computed(() => {
     <!-- Optional: Label inside or tooltip? -->
     <div 
         v-if="entity.labelConfig.show" 
+        ref="labelRef"
         class="entity-label"
         :style="labelStyle"
         @mousedown="onLabelMouseDown"
