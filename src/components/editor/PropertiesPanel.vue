@@ -224,7 +224,7 @@ const version = __APP_VERSION__;
         <div v-else-if="selectedEntity" class="entity-properties">
             <div class="header-row">
                 <h3>{{ selectedEntity.label }}</h3>
-                <button class="icon-btn danger" @click="deleteEntity">🗑️</button>
+                <button class="icon-btn close" @click="store.selectedEntityId = null">X</button>
             </div>
 
             <div class="scroll-area">
@@ -316,6 +316,9 @@ const version = __APP_VERSION__;
                     </button>
                 </div>
 
+                <div class="danger-actions" style="margin-top: 1rem;">
+                    <button class="icon-btn danger" @click="deleteEntity">Remove Entity</button>
+                </div>
             </div>
         </div>
     </div>
@@ -386,7 +389,7 @@ const version = __APP_VERSION__;
     margin-bottom: 0.25rem;
 }
 
-.config-actions {
+.config-actions, .danger-actions {
     border-top: 1px solid rgba(255,255,255,0.1);
     padding-top: 1rem;
 }
@@ -396,6 +399,13 @@ const version = __APP_VERSION__;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1rem;
+}
+
+.icon-btn.close {
+    background: transparent;
+    color: var(--color-text-primary);
+    padding: 0.5rem;
+    font-size: 1.5rem;
 }
 
 .icon-btn.danger {
