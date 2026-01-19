@@ -245,11 +245,10 @@ function onTouchEnd() {
     });
 
     const labelStyle = computed(() => {
-        const { offsetX, offsetY, color, fontSize } = props.entity.labelConfig || {};
+        const { offsetX, offsetY, color } = props.entity.labelConfig || {};
         return {
             transform: `translate(-50%, -50%) translate(${offsetX || 0}%, ${offsetY || 0}%)`,
             color: color || '#ffffff',
-            fontSize: `${fontSize || 14}px`
         };
     });
 

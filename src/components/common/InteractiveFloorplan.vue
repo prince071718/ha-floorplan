@@ -81,11 +81,10 @@ function getEntityVisualStyle(entity: any) {
 }
 
 function getLabelStyle(entity: any) {
-    const { offsetX, offsetY, color, fontSize } = entity.labelConfig || {};
+    const { offsetX, offsetY, color } = entity.labelConfig || {};
     return {
         transform: `translate(-50%, -50%) translate(${offsetX || 0}%, ${offsetY || 0}%)`,
         color: color || '#ffffff',
-        fontSize: `${fontSize || 14}px`,
         pointerEvents: 'auto' as const,
         cursor: 'pointer' as const
     };

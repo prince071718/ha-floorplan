@@ -14,11 +14,9 @@ export interface EntityStyle {
 
 export interface LabelConfig {
   show: boolean;
-  text: string;
   offsetX: number;
   offsetY: number;
   color: string;
-  fontSize: number;
 }
 
 export interface EntityConfig {

@@ -49,11 +49,9 @@ export const useFloorplanStore = defineStore('floorplan', () => {
             },
             labelConfig: {
                 show: true,
-                text: 'New Entity',
                 offsetX: 0,
                 offsetY: 10, // px or %? Let's assume px for offset relative to center or bottom
                 color: '#ffffff',
-                fontSize: 14
             }
         };
         config.value.entities.push(newEntity);
