@@ -1,6 +1,9 @@
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import { resolve } from 'path';
+import { execSync } from 'child_process';
+
+const commitHash = execSync('git describe --tags --always').toString().trim();
 
 export default defineConfig({
     plugins: [vue({
@@ -35,6 +38,7 @@ export default defineConfig({
         }
     },
     define: {
-        'process.env': {}
+        'process.env': {},
+        __APP_VERSION__: JSON.stringify(commitHash)
     }
 });

@@ -168,6 +168,7 @@ function clearPoints() {
 // Ideally we validat/actionize. 
 // BUT for a local tool, direct mutation is often acceptable if 'store' is just state.
 // Let's try direct binding for now for speed, if it fails we wrap.
+const version = __APP_VERSION__;
 </script>
 
 <template>
@@ -316,6 +317,10 @@ function clearPoints() {
 
             </div>
         </div>
+    </div>
+    
+    <div class="panel-footer">
+        v{{ version }}
     </div>
   </div>
 </template>
@@ -468,4 +473,17 @@ button.active {
 }
 
 
+.hint.small {
+    margin-bottom: 0.5rem;
+    font-size: 0.8rem;
+}
+
+.panel-footer {
+    padding: 0.5rem;
+    text-align: center;
+    font-size: 0.7rem;
+    color: var(--color-text-secondary);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: auto; /* Pushes to bottom */
+}
 </style>
