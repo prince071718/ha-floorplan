@@ -270,6 +270,7 @@ const labelStyle = computed(() => {
     white-space: nowrap;
     pointer-events: auto;
     cursor: grab;
+    line-height: 1.2;
 }
 
 .entity-label:active {
