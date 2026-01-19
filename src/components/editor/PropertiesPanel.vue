@@ -237,6 +237,7 @@ const version = __APP_VERSION__;
                     <select v-model="selectedEntity.type">
                         <option value="light">Light</option>
                         <option value="media_player">Media Player</option>
+                        <option value="camera">Camera</option>
                     </select>
                 </div>
 

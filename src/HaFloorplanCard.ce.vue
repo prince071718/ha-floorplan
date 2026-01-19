@@ -60,6 +60,8 @@ const entityStates = computed(() => {
                 // Consider ON if not explicitly off or unavailable. 
                 // This includes 'idle', 'paused', 'playing', 'buffering', 'on'
                 isOn = haState.state !== 'off' && haState.state !== 'unavailable' && haState.state !== 'unknown';
+            } else if (entity.type === 'camera') {
+                isOn = haState.state === 'recording' || haState.state === 'streaming';
             } else {
                 isOn = haState.state === 'on'; // default
             }
@@ -81,6 +83,12 @@ function handleEntityClick(entityId: string, type: string) {
         });
     } else if (type === 'media_player') {
          props.hass.callService('media_player', 'toggle', {
+            entity_id: entityId
+        });
+    } else if (type === 'camera') {
+        // Not all cameras support turn_on/turn_off
+        const service = entityStates.value[entityId]?.isOn ? 'turn_off' : 'turn_on';
+        props.hass.callService('homeassistant', service, {
             entity_id: entityId
         });
     } else {
