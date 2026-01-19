@@ -30,4 +30,10 @@ function toggleDrawMode() {
   width: 100%;
   overflow: hidden;
 }
+
+@media (max-width: 768px) {
+  .editor-layout {
+    flex-direction: column;
+  }
+}
 </style>

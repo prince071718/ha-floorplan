@@ -114,6 +114,40 @@ function onPointMouseUp() {
     window.removeEventListener('mousemove', onPointMouseMove);
     window.removeEventListener('mouseup', onPointMouseUp);
 }
+
+function onPointTouchStart(index: number, event: TouchEvent) {
+    event.stopPropagation();
+    draggingKey.value = index;
+    window.addEventListener('touchmove', onPointTouchMove, { passive: false });
+    window.addEventListener('touchend', onPointTouchEnd);
+}
+
+function onPointTouchMove(event: TouchEvent) {
+    if (draggingKey.value === null || !store.selectedEntity) return;
+    event.preventDefault(); // Stop scrolling
+
+    const container = document.querySelector('.image-wrapper'); 
+    if (!container) return;
+    
+    const touch = event.touches[0];
+    if (!touch) return;
+
+    const rect = container.getBoundingClientRect();
+    const x = ((touch.clientX - rect.left) / rect.width) * 100;
+    const y = ((touch.clientY - rect.top) / rect.height) * 100;
+    
+    const points = [...(store.selectedEntity.points || [])];
+    if (points[draggingKey.value]) {
+        points[draggingKey.value] = { x, y };
+        store.updateEntity(store.selectedEntity.id, { points });
+    }
+}
+
+function onPointTouchEnd() {
+    draggingKey.value = null;
+    window.removeEventListener('touchmove', onPointTouchMove);
+    window.removeEventListener('touchend', onPointTouchEnd);
+}
 </script>
 
 <template>
@@ -195,6 +229,7 @@ function onPointMouseUp() {
                         stroke-width="0.1"
                         style="cursor: grab; pointer-events: auto;"
                         @mousedown="onPointMouseDown(index, $event)"
+                        @touchstart="onPointTouchStart(index, $event)"
                         @click.stop
                     />
                 </template>

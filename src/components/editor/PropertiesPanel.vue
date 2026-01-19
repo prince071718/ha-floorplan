@@ -328,6 +328,16 @@ function clearPoints() {
   display: flex;
   flex-direction: column;
   height: 100%;
+  z-index: 10; /* Ensure above canvas if needed */
+}
+
+@media (max-width: 768px) {
+  .properties-panel {
+    width: 100%;
+    height: 40%; /* Take bottom 40% */
+    border-left: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
 }
 
 .panel-header {

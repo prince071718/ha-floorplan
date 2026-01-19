@@ -63,6 +63,58 @@ function onMouseUp() {
   window.removeEventListener('mouseup', onMouseUp);
 }
 
+// Touch Logic
+function onTouchStart(event: TouchEvent) {
+  event.stopPropagation();
+  // Prevent scrolling if we are starting a drag
+  // event.preventDefault(); 
+  
+  store.selectedEntityId = props.entity.id;
+  
+  const touch = event.touches[0];
+  if (!touch) return;
+
+  isDragging.value = true;
+  dragStart.value = { x: touch.clientX, y: touch.clientY };
+  
+  window.addEventListener('touchmove', onTouchMove, { passive: false });
+  window.addEventListener('touchend', onTouchEnd);
+}
+
+function onTouchMove(event: TouchEvent) {
+  if (!isDragging.value) return;
+  event.preventDefault(); // Stop scrolling
+
+  const touch = event.touches[0];
+  if (!touch) return;
+
+  const dx = touch.clientX - dragStart.value.x;
+  const dy = touch.clientY - dragStart.value.y;
+  
+  const container = document.querySelector('.image-wrapper'); 
+  if (!container) return;
+  
+  const rect = container.getBoundingClientRect();
+  const width = rect.width;
+  const height = rect.height;
+  
+  const dxPercent = (dx / width) * 100;
+  const dyPercent = (dy / height) * 100;
+  
+  store.updateEntity(props.entity.id, {
+    x: props.entity.x + dxPercent,
+    y: props.entity.y + dyPercent
+  });
+  
+  dragStart.value = { x: touch.clientX, y: touch.clientY };
+}
+
+function onTouchEnd() {
+  isDragging.value = false;
+  window.removeEventListener('touchmove', onTouchMove);
+  window.removeEventListener('touchend', onTouchEnd);
+}
+
 
 // Style computation
 const styleObject = computed(() => {
@@ -99,6 +151,7 @@ const styleObject = computed(() => {
     class="entity-overlay" 
     :style="styleObject"
     @mousedown="onMouseDown"
+    @touchstart="onTouchStart"
     @click.stop
   >
     <!-- Optional: Label inside or tooltip? -->
