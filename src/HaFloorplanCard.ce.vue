@@ -180,9 +180,8 @@ ha-card {
 
 .entity-label {
     position: absolute;
-    top: 100%;
+    top: 50%;
     left: 50%;
-    transform: translateX(-50%);
     background: rgba(0,0,0,0.7);
     color: white;
     padding: 2px 4px;
@@ -190,7 +189,6 @@ ha-card {
     border-radius: 4px;
     white-space: nowrap;
     pointer-events: none;
-    margin-top: 4px;
     line-height: 1.2;
 }
 

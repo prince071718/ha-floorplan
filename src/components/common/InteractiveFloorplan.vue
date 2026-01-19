@@ -80,6 +80,17 @@ function getEntityVisualStyle(entity: any) {
     };
 }
 
+function getLabelStyle(entity: any) {
+    const { offsetX, offsetY, color, fontSize } = entity.labelConfig || {};
+    return {
+        transform: `translate(calc(-50% + ${offsetX || 0}px), calc(-50% + ${offsetY || 0}px))`,
+        color: color || '#ffffff',
+        fontSize: `${fontSize || 14}px`,
+        pointerEvents: 'auto' as const,
+        cursor: 'pointer' as const
+    };
+}
+
 function getPointsString(points?: {x: number, y: number}[]) {
     if (!points) return '';
     return points.map(p => `${p.x} ${p.y}`).join(',');
@@ -133,7 +144,7 @@ function getPointsString(points?: {x: number, y: number}[]) {
              <div 
                 v-if="entity.labelConfig.show" 
                 class="entity-label" 
-                style="pointer-events: auto; cursor: pointer;"
+                :style="getLabelStyle(entity)"
                 @click.stop="onEntityClick(entity)"
              >
                 {{ entity.label }}

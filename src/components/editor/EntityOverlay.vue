@@ -14,6 +14,9 @@ const isSelected = computed(() => store.selectedEntityId === props.entity.id);
 const isDragging = ref(false);
 const dragStart = ref({ x: 0, y: 0 });
 
+const isLabelDragging = ref(false);
+const labelDragStart = ref({ x: 0, y: 0 });
+
 // We need to calculate % movement based on parent size. 
 // Since we don't have easy access to parent ref here without inject/props, 
 // we'll rely on event.target.offsetParent to get dimensions.
@@ -116,6 +119,79 @@ function onTouchEnd() {
 }
 
 
+
+
+// Label Drag Logic
+function onLabelMouseDown(event: MouseEvent) {
+    event.stopPropagation(); // Don't drag entity
+    isLabelDragging.value = true;
+    labelDragStart.value = { x: event.clientX, y: event.clientY };
+    window.addEventListener('mousemove', onLabelMouseMove);
+    window.addEventListener('mouseup', onLabelMouseUp);
+}
+
+function onLabelMouseMove(event: MouseEvent) {
+    if (!isLabelDragging.value) return;
+    const dx = event.clientX - labelDragStart.value.x;
+    const dy = event.clientY - labelDragStart.value.y;
+    
+    // Update labelConfig offset
+    const currentConfig = props.entity.labelConfig;
+    store.updateEntity(props.entity.id, {
+        labelConfig: {
+            ...currentConfig,
+            offsetX: (currentConfig.offsetX || 0) + dx,
+            offsetY: (currentConfig.offsetY || 0) + dy
+        }
+    });
+
+    labelDragStart.value = { x: event.clientX, y: event.clientY };
+}
+
+function onLabelMouseUp() {
+    isLabelDragging.value = false;
+    window.removeEventListener('mousemove', onLabelMouseMove);
+    window.removeEventListener('mouseup', onLabelMouseUp);
+}
+
+function onLabelTouchStart(event: TouchEvent) {
+    event.stopPropagation();
+    const touch = event.touches[0];
+    if (!touch) return;
+    
+    isLabelDragging.value = true;
+    labelDragStart.value = { x: touch.clientX, y: touch.clientY };
+    window.addEventListener('touchmove', onLabelTouchMove, { passive: false });
+    window.addEventListener('touchend', onLabelTouchEnd);
+}
+
+function onLabelTouchMove(event: TouchEvent) {
+    if (!isLabelDragging.value) return;
+    event.preventDefault(); 
+    const touch = event.touches[0];
+    if (!touch) return;
+
+    const dx = touch.clientX - labelDragStart.value.x;
+    const dy = touch.clientY - labelDragStart.value.y;
+
+    const currentConfig = props.entity.labelConfig;
+    store.updateEntity(props.entity.id, {
+        labelConfig: {
+            ...currentConfig,
+            offsetX: (currentConfig.offsetX || 0) + dx,
+            offsetY: (currentConfig.offsetY || 0) + dy
+        }
+    });
+
+    labelDragStart.value = { x: touch.clientX, y: touch.clientY };
+}
+
+function onLabelTouchEnd() {
+    isLabelDragging.value = false;
+    window.removeEventListener('touchmove', onLabelTouchMove);
+    window.removeEventListener('touchend', onLabelTouchEnd);
+}
+
 // Style computation
 const styleObject = computed(() => {
   const { shape, style, x, y } = props.entity;
@@ -144,6 +220,15 @@ const styleObject = computed(() => {
   return baseStyle;
 });
 
+const labelStyle = computed(() => {
+    const { offsetX, offsetY, color, fontSize } = props.entity.labelConfig || {};
+    return {
+        transform: `translate(calc(-50% + ${offsetX || 0}px), calc(-50% + ${offsetY || 0}px))`,
+        color: color || '#ffffff',
+        fontSize: `${fontSize || 14}px`
+    };
+});
+
 </script>
 
 <template>
@@ -155,7 +240,14 @@ const styleObject = computed(() => {
     @click.stop
   >
     <!-- Optional: Label inside or tooltip? -->
-    <div v-if="entity.labelConfig.show" class="entity-label">
+    <div 
+        v-if="entity.labelConfig.show" 
+        class="entity-label"
+        :style="labelStyle"
+        @mousedown="onLabelMouseDown"
+        @touchstart="onLabelTouchStart"
+        @click.stop
+    >
         {{ entity.label }}
     </div>
   </div>
@@ -169,17 +261,18 @@ const styleObject = computed(() => {
 
 .entity-label {
     position: absolute;
-    top: 100%;
+    top: 50%;
     left: 50%;
-    transform: translateX(-50%);
+    /* transform handled incorrectly inline */
     background: rgba(0,0,0,0.7);
-    color: white;
     padding: 2px 4px;
-    font-size: 0.75rem;
     border-radius: 4px;
     white-space: nowrap;
-    white-space: nowrap;
     pointer-events: auto;
-    margin-top: 4px;
+    cursor: grab;
+}
+
+.entity-label:active {
+    cursor: grabbing;
 }
 </style>
