@@ -24,7 +24,7 @@ Use the online editor to:
 
 ---
 
-## 🚀 Installation
+## Installation
 
 ### Option A: Direct Link (Recommended)
 You can directly link to the JS file from the master branch using JSDelivr:
