@@ -4,12 +4,12 @@ import { computed, ref } from 'vue';
 
 const props = defineProps<{
     config: FloorplanConfig,
-    entityStates: Record<string, EntityState>, 
+    entityStates: Record<string, EntityState>,
 }>();
 
 const emit = defineEmits<{
-  (e: 'entity-click', entityId: string, type: string): void
-  (e: 'entity-long-press', entityId: string): void
+    (e: 'entity-click', entityId: string, type: string): void
+    (e: 'entity-long-press', entityId: string): void
 }>();
 
 const hasImage = computed(() => !!props.config.imageBase64);
@@ -23,7 +23,7 @@ function handlePointerDown(event: PointerEvent, entity: any) {
     if (event.button !== 0) return; // Only left click
     isLongPress.value = false;
     pointerStart.value = { x: event.clientX, y: event.clientY };
-    
+
     longPressTimer.value = window.setTimeout(() => {
         isLongPress.value = true;
         emit('entity-long-press', entity.entityId);
@@ -48,7 +48,7 @@ function handlePointerUp(event: PointerEvent, entity: any) {
 }
 
 function handlePointerLeave() {
-     if (longPressTimer.value) {
+    if (longPressTimer.value) {
         clearTimeout(longPressTimer.value);
         longPressTimer.value = null;
     }
@@ -58,6 +58,28 @@ function getEntityValues(entity: any) {
     const state = props.entityStates[entity.entityId] || { isOn: false };
     const { style } = entity;
 
+    // Handle camera entities with state-specific colors
+    if (entity.type === 'camera' && state.cameraState) {
+        let color: string;
+        const defaultIdleColor = '#6b7280'; // Gray
+        const defaultRecordingColor = '#ef4444'; // Red
+        const defaultStreamingColor = '#3b82f6'; // Blue
+
+        if (state.cameraState === 'recording') {
+            color = style.cameraRecordingColor || defaultRecordingColor;
+        } else if (state.cameraState === 'streaming') {
+            color = style.cameraStreamingColor || defaultStreamingColor;
+        } else {
+            color = style.cameraIdleColor || defaultIdleColor;
+        }
+
+        return {
+            color,
+            opacity: style.onOpacity
+        };
+    }
+
+    // Handle other entity types
     if (!state.isOn) {
         return {
             color: style.offColor,
@@ -93,16 +115,16 @@ function getEntityVisualStyle(entity: any) {
     const { color, opacity } = getEntityValues(entity);
     const { shape } = entity;
     const state = props.entityStates[entity.entityId] || { isOn: false };
-    
+
     // Ensure minimum visibility for low brightness if ON
     // If Opacity is 0.8, and brightness is 1/255, we want at least say 0.1 or 0.2
     let effectiveOpacity = opacity;
     if (state.isOn && state.brightness !== undefined) {
-         // Map 0-255 brightness to range [0.3, style.onOpacity]
-         const minOpacity = 0.3;
-         const maxOpacity = entity.style.onOpacity;
-         const brightnessFactor = state.brightness / 255;
-         effectiveOpacity = minOpacity + (brightnessFactor * (maxOpacity - minOpacity));
+        // Map 0-255 brightness to range [0.3, style.onOpacity]
+        const minOpacity = 0.3;
+        const maxOpacity = entity.style.onOpacity;
+        const brightnessFactor = state.brightness / 255;
+        effectiveOpacity = minOpacity + (brightnessFactor * (maxOpacity - minOpacity));
     }
 
     return {
@@ -127,74 +149,78 @@ function getLabelStyle(entity: any) {
     };
 }
 
-function getPointsString(points?: {x: number, y: number}[]) {
+function getPointsString(points?: { x: number, y: number }[]) {
     if (!points) return '';
     return points.map(p => `${p.x} ${p.y}`).join(',');
 }
+
+function isRecording(entity: any) {
+    const state = props.entityStates[entity.entityId];
+    return entity.type === 'camera' && state?.cameraState === 'recording';
+}
+
 </script>
 
 <template>
-  <div class="viewer-area">
-    <div v-if="!hasImage" class="empty-state">
-      <p>No floorplan loaded. Go to Editor to set up.</p>
-    </div>
+    <div class="viewer-area">
+        <div v-if="!hasImage" class="empty-state">
+            <p>No floorplan loaded. Go to Editor to set up.</p>
+        </div>
 
-     <div v-else class="canvas-container">
-       <div class="image-wrapper">
-          <img :src="props.config.imageBase64" alt="Floorplan Base" draggable="false" />
-          
-          <svg class="overlay-layer" viewBox="0 0 100 100" preserveAspectRatio="none">
-            <defs>
-              <radialGradient 
-                v-for="entity in props.config.entities"
-                :key="'grad-' + entity.id"
-                :id="'grad-' + entity.id"
-                gradientUnits="userSpaceOnUse"
-                :cx="entity.x"
-                :cy="entity.y"
-                :r="entity.style.gradientRadius"
-              >
-                <stop offset="0%" :stop-color="getEntityValues(entity).color" :stop-opacity="Math.max(0.3, getEntityValues(entity).opacity)" />
-                <stop offset="100%" :stop-color="getEntityValues(entity).color" stop-opacity="0" />
-              </radialGradient>
-            </defs>
-            <polygon 
-                v-for="entity in props.config.entities"
-                :key="'poly-' + entity.id"
-                :points="getPointsString(entity.points)"
-                :fill="props.entityStates[entity.entityId]?.isOn ? `url(#grad-${entity.id})` : 'transparent'"
-                stroke="none"
-                style="pointer-events: none; transition: fill-opacity 0.3s ease;"
-            />
-          </svg>
-          
-          <div 
-            v-for="entity in props.config.entities" 
-            :key="entity.id"
-            class="interactive-entity"
-            :style="getEntityPositionStyle(entity)"
-            @pointerdown="handlePointerDown($event, entity)"
-            @pointerup="handlePointerUp($event, entity)"
-            @pointerleave="handlePointerLeave()"
-            :title="entity.label"
-          >
-             <div class="entity-shape" :style="getEntityVisualStyle(entity)"></div>
-             <div 
-                v-if="entity.labelConfig.show" 
-                class="entity-label" 
-                :style="getLabelStyle(entity)"
-                @pointerdown.stop="handlePointerDown($event, entity)"
-                @pointerup.stop="handlePointerUp($event, entity)"
-                @pointerleave.stop="handlePointerLeave()"
-             >
-                {{ entity.label }}
-             </div>
-          </div>
-       </div>
+        <div v-else class="canvas-container">
+            <div class="image-wrapper">
+                <img :src="props.config.imageBase64" alt="Floorplan Base" draggable="false" />
+
+                <svg class="overlay-layer" viewBox="0 0 100 100" preserveAspectRatio="none">
+                    <defs>
+                        <radialGradient v-for="entity in props.config.entities" :key="'grad-' + entity.id"
+                            :id="'grad-' + entity.id" gradientUnits="userSpaceOnUse" :cx="entity.x" :cy="entity.y"
+                            :r="entity.style.gradientRadius">
+                            <stop offset="0%" :stop-color="getEntityValues(entity).color"
+                                :stop-opacity="Math.max(0.3, getEntityValues(entity).opacity)" />
+                            <stop offset="100%" :stop-color="getEntityValues(entity).color" stop-opacity="0" />
+                        </radialGradient>
+                    </defs>
+                    <polygon v-for="entity in props.config.entities" :key="'poly-' + entity.id"
+                        :points="getPointsString(entity.points)"
+                        :fill="props.entityStates[entity.entityId]?.isOn ? `url(#grad-${entity.id})` : 'transparent'"
+                        stroke="none" style="pointer-events: none; transition: fill-opacity 0.3s ease;" />
+                </svg>
+
+                <div v-for="entity in props.config.entities" :key="entity.id" class="interactive-entity"
+                    :style="getEntityPositionStyle(entity)" @pointerdown="handlePointerDown($event, entity)"
+                    @pointerup="handlePointerUp($event, entity)" @pointerleave="handlePointerLeave()"
+                    :title="entity.label">
+                    <div class="entity-shape" :class="{ 'camera-recording': isRecording(entity) }"
+                        :style="getEntityVisualStyle(entity)"></div>
+                    <div v-if="entity.labelConfig.show" class="entity-label" :style="getLabelStyle(entity)"
+                        @pointerdown.stop="handlePointerDown($event, entity)"
+                        @pointerup.stop="handlePointerUp($event, entity)" @pointerleave.stop="handlePointerLeave()">
+                        {{ entity.label }}
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 </template>
 
 <style scoped>
 /* Styles moved to parent component to ensure Shadow DOM injection in CE mode */
+
+/* Blinking animation for camera recording state */
+@keyframes camera-recording-blink {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.3;
+    }
+}
+
+.camera-recording {
+    animation: camera-recording-blink 2s ease-in-out infinite;
+}
 </style>

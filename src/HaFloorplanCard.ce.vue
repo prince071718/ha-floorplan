@@ -23,7 +23,7 @@ const parsedConfig = computed((): FloorplanConfig | null => {
     } else {
         conf = props.config as FloorplanConfig;
     }
-    
+
     // Ensure imageBase64 is clean (strip newlines/spaces from YAML folding)
     if (conf && conf.imageBase64) {
         return {
@@ -63,14 +63,30 @@ const entityStates = computed(() => {
                 // This includes 'idle', 'paused', 'playing', 'buffering', 'on'
                 isOn = haState.state !== 'off' && haState.state !== 'unavailable' && haState.state !== 'unknown';
             } else if (entity.type === 'camera') {
-                isOn = haState.state === 'recording' || haState.state === 'streaming';
+                // Detect camera state
+                const state = haState.state.toLowerCase();
+                let cameraState: 'idle' | 'recording' | 'streaming' = 'idle';
+
+                if (state === 'recording') {
+                    cameraState = 'recording';
+                    isOn = true;
+                } else if (state === 'streaming') {
+                    cameraState = 'streaming';
+                    isOn = true;
+                } else {
+                    cameraState = 'idle';
+                    isOn = false;
+                }
+
+                states[entity.entityId] = { isOn, cameraState };
+                return; // Early return for camera to avoid overwriting below
             } else {
                 isOn = haState.state === 'on'; // default
             }
-            
+
             states[entity.entityId] = { isOn, color, brightness };
         } else {
-             states[entity.entityId] = { isOn: false };
+            states[entity.entityId] = { isOn: false };
         }
     });
     return states;
@@ -84,7 +100,7 @@ function handleEntityClick(entityId: string, type: string) {
             entity_id: entityId
         });
     } else if (type === 'media_player') {
-         props.hass.callService('media_player', 'toggle', {
+        props.hass.callService('media_player', 'toggle', {
             entity_id: entityId
         });
     } else if (type === 'camera') {
@@ -95,7 +111,7 @@ function handleEntityClick(entityId: string, type: string) {
         });
     } else {
         // Default toggle
-         props.hass.callService('homeassistant', 'toggle', {
+        props.hass.callService('homeassistant', 'toggle', {
             entity_id: entityId
         });
     }
@@ -118,31 +134,29 @@ console.info(`%c HA Floorplan Card %c ${__APP_VERSION__} `, 'background: #333; c
 </script>
 
 <template>
-  <ha-card ref="cardRef" class="ha-card-wrapper" v-if="parsedConfig">
-    <InteractiveFloorplan 
-        :config="parsedConfig" 
-        :entity-states="entityStates"
-        @entity-click="handleEntityClick"
-        @entity-long-press="handleEntityLongPress"
-    />
-  </ha-card>
-  <div v-else class="error">
-    No Configuration Loaded
-  </div>
+    <ha-card ref="cardRef" class="ha-card-wrapper" v-if="parsedConfig">
+        <InteractiveFloorplan :config="parsedConfig" :entity-states="entityStates" @entity-click="handleEntityClick"
+            @entity-long-press="handleEntityLongPress" />
+    </ha-card>
+    <div v-else class="error">
+        No Configuration Loaded
+    </div>
 </template>
 
 <style>
 /* Basic reset for the shadow DOM */
 :host {
-  display: block !important;
-  width: 100% !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  box-sizing: border-box !important;
+    display: block !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
 }
 
-*, *::before, *::after {
-  box-sizing: border-box;
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
 }
 
 ha-card {
@@ -150,7 +164,8 @@ ha-card {
     width: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
-    background: none !important; /* Let the floorplan be the background or transparent */
+    background: none !important;
+    /* Let the floorplan be the background or transparent */
     box-shadow: none !important;
     border: none !important;
 }
@@ -164,14 +179,14 @@ ha-card {
 
 /* Styles migrated from InteractiveFloorplan.vue for CE compatibility */
 .viewer-area {
-  flex: 1;
-  background-color: transparent; 
-  display: block; 
-  position: relative;
-  padding: 0 !important;
-  margin: 0 !important;
-  height: auto;
-  width: 100% !important;
+    flex: 1;
+    background-color: transparent;
+    display: block;
+    position: relative;
+    padding: 0 !important;
+    margin: 0 !important;
+    height: auto;
+    width: 100% !important;
 }
 
 .empty-state {
@@ -182,36 +197,37 @@ ha-card {
 }
 
 .canvas-container {
-  /* box-shadow removed for card mode */
-  border-radius: 0;
-  overflow: hidden;
-  position: relative;
-  max-width: 100%;
-  max-height: 100%;
+    /* box-shadow removed for card mode */
+    border-radius: 0;
+    overflow: hidden;
+    position: relative;
+    max-width: 100%;
+    max-height: 100%;
 }
 
 .image-wrapper {
-  position: relative;
-  display: block;
-  width: 100%;
-  line-height: 0;
-  container-type: inline-size;
+    position: relative;
+    display: block;
+    width: 100%;
+    line-height: 0;
+    container-type: inline-size;
 }
 
 .image-wrapper img {
-  width: 100%;
-  height: auto;
-  display: block;
+    width: 100%;
+    height: auto;
+    display: block;
 }
 
 .entity-label {
     position: absolute;
     top: 50%;
     left: 50%;
-    background: rgba(0,0,0,0.7);
+    background: rgba(0, 0, 0, 0.7);
     color: white;
     padding: 2px 4px;
-    font-size: 14px; /* Fallback */
+    font-size: 14px;
+    /* Fallback */
     font-size: 1.5cqw;
     border-radius: 4px;
     white-space: nowrap;

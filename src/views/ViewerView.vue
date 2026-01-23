@@ -7,11 +7,8 @@ const store = useFloorplanStore();
 
 <template>
   <div class="viewer-view">
-    <InteractiveFloorplan 
-      :config="store.config"
-      :entity-states="store.entityStates"
-      @entity-click="(id) => store.toggleEntityState(id)"
-    />
+    <InteractiveFloorplan :config="store.config" :entity-states="store.entityStates"
+      @entity-click="(id) => store.toggleEntityState(id, store.config.entities.find(e => e.entityId === id)?.type || 'light')" />
   </div>
 </template>
 

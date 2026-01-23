@@ -10,6 +10,9 @@ export interface EntityStyle {
   offOpacity: number;
   gradientRadius: number; // percentage
   rotation: number; // degrees
+  cameraIdleColor?: string; // Color for camera when idle/off
+  cameraRecordingColor?: string; // Color for camera when recording (will blink)
+  cameraStreamingColor?: string; // Color for camera when streaming
 }
 
 export interface LabelConfig {
@@ -45,4 +48,5 @@ export interface EntityState {
   isOn: boolean;
   color?: string; // hex or rgb string
   brightness?: number; // 0-255
+  cameraState?: 'idle' | 'recording' | 'streaming'; // Camera-specific state
 }

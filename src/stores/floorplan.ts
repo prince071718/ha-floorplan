@@ -45,7 +45,10 @@ export const useFloorplanStore = defineStore('floorplan', () => {
                 onOpacity: 0.8,
                 offOpacity: 0.3,
                 gradientRadius: 30,
-                rotation: 0
+                rotation: 0,
+                cameraIdleColor: '#6b7280',
+                cameraRecordingColor: '#ef4444',
+                cameraStreamingColor: '#3b82f6'
             },
             labelConfig: {
                 show: true,
@@ -77,9 +80,20 @@ export const useFloorplanStore = defineStore('floorplan', () => {
         }
     }
 
-    function toggleEntityState(entityId: string) {
-        const current = entityStates.value[entityId] || { isOn: false, brightness: 255 };
-        entityStates.value[entityId] = { ...current, isOn: !current.isOn };
+    function toggleEntityState(entityId: string, entityType: string) {
+        const current = entityStates.value[entityId] || { isOn: false, brightness: 255, cameraState: 'idle' };
+        console.log('Toggling state for entity', entityId, entityType);
+        if (entityType === 'camera') {
+            if (current.cameraState === 'idle') {
+                entityStates.value[entityId] = { ...current, cameraState: 'streaming' };
+            } else if (current.cameraState === 'streaming') {
+                entityStates.value[entityId] = { ...current, cameraState: 'recording' };
+            } else {
+                entityStates.value[entityId] = { ...current, cameraState: 'idle' };
+            }
+        } else {
+            entityStates.value[entityId] = { ...current, isOn: !current.isOn };
+        }
     }
 
     function setEntityState(entityId: string, state: boolean) {

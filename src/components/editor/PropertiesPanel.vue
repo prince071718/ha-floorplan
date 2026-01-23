@@ -278,20 +278,51 @@ const version = __APP_VERSION__;
                     </div>
                 </div>
 
-                 <div class="section-title">Default Colors</div>
-                 <div class="input-group">
-                    <label>On Color</label>
-                    <div class="color-picker-row">
-                        <input type="color" v-model="selectedEntity.style.onColor">
-                        <input type="text" v-model="selectedEntity.style.onColor">
+                 <!-- Default Colors - hidden for camera entities -->
+                 <div v-if="selectedEntity.type !== 'camera'">
+                     <div class="section-title">Default Colors</div>
+                     <div class="input-group">
+                        <label>On Color</label>
+                        <div class="color-picker-row">
+                            <input type="color" v-model="selectedEntity.style.onColor">
+                            <input type="text" v-model="selectedEntity.style.onColor">
+                        </div>
                     </div>
-                </div>
+                    
+                    <div class="input-group">
+                        <label>Off Color</label>
+                         <div class="color-picker-row">
+                            <input type="color" v-model="selectedEntity.style.offColor">
+                            <input type="text" v-model="selectedEntity.style.offColor">
+                        </div>
+                    </div>
+                 </div>
                 
-                <div class="input-group">
-                    <label>Off Color</label>
-                     <div class="color-picker-row">
-                        <input type="color" v-model="selectedEntity.style.offColor">
-                        <input type="text" v-model="selectedEntity.style.offColor">
+                <!-- Camera-specific colors -->
+                <div v-if="selectedEntity.type === 'camera'">
+                    <div class="section-title">Camera State Colors</div>
+                    <div class="input-group">
+                        <label>Idle/Off Color</label>
+                        <div class="color-picker-row">
+                            <input type="color" v-model="selectedEntity.style.cameraIdleColor">
+                            <input type="text" v-model="selectedEntity.style.cameraIdleColor">
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Recording Color (Blinks)</label>
+                        <div class="color-picker-row">
+                            <input type="color" v-model="selectedEntity.style.cameraRecordingColor">
+                            <input type="text" v-model="selectedEntity.style.cameraRecordingColor">
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Streaming Color</label>
+                        <div class="color-picker-row">
+                            <input type="color" v-model="selectedEntity.style.cameraStreamingColor">
+                            <input type="text" v-model="selectedEntity.style.cameraStreamingColor">
+                        </div>
                     </div>
                 </div>
                 
