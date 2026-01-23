@@ -60,7 +60,11 @@ export const useFloorplanStore = defineStore('floorplan', () => {
         config.value.entities.push(newEntity);
         selectedEntityId.value = id;
         // Init state
-        entityStates.value[newEntity.entityId] = { isOn: false, brightness: 255 };
+        let initialState = 'off'
+        if (newEntity.type === 'camera') {
+            initialState = 'idle'
+        }
+        entityStates.value[newEntity.entityId] = { state: initialState, brightness: 255 };
     }
 
     function removeEntity(id: string) {
@@ -81,24 +85,26 @@ export const useFloorplanStore = defineStore('floorplan', () => {
     }
 
     function toggleEntityState(entityId: string, entityType: string) {
-        const current = entityStates.value[entityId] || { isOn: false, brightness: 255, cameraState: 'idle' };
-        console.log('Toggling state for entity', entityId, entityType);
+        const current = entityStates.value[entityId] || { state: 'off', brightness: 255 };
+        let newState = current;
         if (entityType === 'camera') {
-            if (current.cameraState === 'idle') {
-                entityStates.value[entityId] = { ...current, cameraState: 'streaming' };
-            } else if (current.cameraState === 'streaming') {
-                entityStates.value[entityId] = { ...current, cameraState: 'recording' };
+            if (current.state === 'idle') {
+                newState = { ...current, state: 'streaming' };
+            } else if (current.state === 'streaming') {
+                newState = { ...current, state: 'recording' };
             } else {
-                entityStates.value[entityId] = { ...current, cameraState: 'idle' };
+                newState = { ...current, state: 'idle' };
             }
         } else {
-            entityStates.value[entityId] = { ...current, isOn: !current.isOn };
+            newState = { ...current, state: current.state === 'off' ? 'on' : 'off' };
         }
+        newState.shouldLightUp = ['on', 'recording', 'streaming'].includes(newState.state);
+        entityStates.value[entityId] = newState;
     }
 
-    function setEntityState(entityId: string, state: boolean) {
-        const current = entityStates.value[entityId] || { isOn: false, brightness: 255 };
-        entityStates.value[entityId] = { ...current, isOn: state };
+    function setEntityState(entityId: string, state: string) {
+        const current = entityStates.value[entityId] || { state: 'off', brightness: 255 };
+        entityStates.value[entityId] = { ...current, state: state };
     }
 
     function loadConfig(newConfig: FloorplanConfig) {
@@ -106,7 +112,7 @@ export const useFloorplanStore = defineStore('floorplan', () => {
         // Reset states
         entityStates.value = {};
         newConfig.entities.forEach(e => {
-            entityStates.value[e.entityId] = { isOn: false, brightness: 255 };
+            entityStates.value[e.entityId] = { state: 'off', brightness: 255 };
         });
     }
 

@@ -12,11 +12,28 @@ const store = useFloorplanStore();
   </div>
 </template>
 
-<style scoped>
+<style>
 .viewer-view {
   width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
+}
+
+/* Blinking animation for camera recording state */
+@keyframes camera-recording-blink {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.3;
+  }
+}
+
+.camera-recording {
+  animation: camera-recording-blink 2s ease-in-out infinite;
 }
 </style>

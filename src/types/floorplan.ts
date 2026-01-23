@@ -45,8 +45,8 @@ export interface FloorplanConfig {
 }
 
 export interface EntityState {
-  isOn: boolean;
+  state: string;
   color?: string; // hex or rgb string
   brightness?: number; // 0-255
-  cameraState?: 'idle' | 'recording' | 'streaming'; // Camera-specific state
+  shouldLightUp?: boolean;
 }

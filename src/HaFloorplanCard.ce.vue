@@ -43,14 +43,13 @@ const entityStates = computed(() => {
     parsedConfig.value.entities?.forEach((entity: any) => {
         const haState = props.hass.states[entity.entityId];
         if (haState) {
-            let isOn = false;
+            let state = haState.state;
             let color: string | undefined = undefined;
             let brightness: number | undefined = undefined;
 
             if (entity.type === 'light') {
-                isOn = haState.state === 'on';
                 // Extract attributes for lights
-                if (isOn) {
+                if (state == 'on') {
                     if (haState.attributes.rgb_color) {
                         color = `rgb(${haState.attributes.rgb_color.join(',')})`;
                     }
@@ -58,35 +57,11 @@ const entityStates = computed(() => {
                         brightness = haState.attributes.brightness;
                     }
                 }
-            } else if (entity.type === 'media_player') {
-                // Consider ON if not explicitly off or unavailable. 
-                // This includes 'idle', 'paused', 'playing', 'buffering', 'on'
-                isOn = haState.state !== 'off' && haState.state !== 'unavailable' && haState.state !== 'unknown';
-            } else if (entity.type === 'camera') {
-                // Detect camera state
-                const state = haState.state.toLowerCase();
-                let cameraState: 'idle' | 'recording' | 'streaming' = 'idle';
-
-                if (state === 'recording') {
-                    cameraState = 'recording';
-                    isOn = true;
-                } else if (state === 'streaming') {
-                    cameraState = 'streaming';
-                    isOn = true;
-                } else {
-                    cameraState = 'idle';
-                    isOn = false;
-                }
-
-                states[entity.entityId] = { isOn, cameraState };
-                return; // Early return for camera to avoid overwriting below
-            } else {
-                isOn = haState.state === 'on'; // default
+                states[entity.entityId] = { state, color, brightness };
             }
-
-            states[entity.entityId] = { isOn, color, brightness };
+            states[entity.entityId] = { state, shouldLightUp: ['on', 'recording', 'streaming'].includes(state) };
         } else {
-            states[entity.entityId] = { isOn: false };
+            states[entity.entityId] = { state: 'off' };
         }
     });
     return states;
@@ -105,7 +80,7 @@ function handleEntityClick(entityId: string, type: string) {
         });
     } else if (type === 'camera') {
         // Not all cameras support turn_on/turn_off
-        const service = entityStates.value[entityId]?.isOn ? 'turn_off' : 'turn_on';
+        const service = entityStates.value[entityId]?.state == 'on' ? 'turn_off' : 'turn_on';
         props.hass.callService('homeassistant', service, {
             entity_id: entityId
         });
@@ -256,5 +231,22 @@ ha-card {
 .error {
     padding: 20px;
     color: red;
+}
+
+/* Blinking animation for camera recording state */
+@keyframes camera-recording-blink {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.3;
+    }
+}
+
+.camera-recording {
+    animation: camera-recording-blink 2s ease-in-out infinite;
 }
 </style>

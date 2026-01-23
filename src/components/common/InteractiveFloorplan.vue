@@ -55,19 +55,19 @@ function handlePointerLeave() {
 }
 
 function getEntityValues(entity: any) {
-    const state = props.entityStates[entity.entityId] || { isOn: false };
+    const state = props.entityStates[entity.entityId] || { state: 'off' };
     const { style } = entity;
 
     // Handle camera entities with state-specific colors
-    if (entity.type === 'camera' && state.cameraState) {
+    if (entity.type === 'camera') {
         let color: string;
         const defaultIdleColor = '#6b7280'; // Gray
         const defaultRecordingColor = '#ef4444'; // Red
         const defaultStreamingColor = '#3b82f6'; // Blue
 
-        if (state.cameraState === 'recording') {
+        if (state.state === 'recording') {
             color = style.cameraRecordingColor || defaultRecordingColor;
-        } else if (state.cameraState === 'streaming') {
+        } else if (state.state === 'streaming') {
             color = style.cameraStreamingColor || defaultStreamingColor;
         } else {
             color = style.cameraIdleColor || defaultIdleColor;
@@ -80,7 +80,7 @@ function getEntityValues(entity: any) {
     }
 
     // Handle other entity types
-    if (!state.isOn) {
+    if (state.state == 'off') {
         return {
             color: style.offColor,
             opacity: style.offOpacity
@@ -114,12 +114,12 @@ function getEntityPositionStyle(entity: any) {
 function getEntityVisualStyle(entity: any) {
     const { color, opacity } = getEntityValues(entity);
     const { shape } = entity;
-    const state = props.entityStates[entity.entityId] || { isOn: false };
+    const state = props.entityStates[entity.entityId] || { state: 'off' };
 
     // Ensure minimum visibility for low brightness if ON
     // If Opacity is 0.8, and brightness is 1/255, we want at least say 0.1 or 0.2
     let effectiveOpacity = opacity;
-    if (state.isOn && state.brightness !== undefined) {
+    if (state.state == 'on' && state.brightness !== undefined) {
         // Map 0-255 brightness to range [0.3, style.onOpacity]
         const minOpacity = 0.3;
         const maxOpacity = entity.style.onOpacity;
@@ -134,7 +134,7 @@ function getEntityVisualStyle(entity: any) {
         opacity: effectiveOpacity,
         borderRadius: shape === 'circle' ? '50%' : '4px',
         cursor: 'pointer',
-        boxShadow: state.isOn ? `0 0 15px ${color}` : 'none',
+        boxShadow: state.state == 'on' ? `0 0 15px ${color}` : 'none',
         transition: 'all 0.3s ease'
     };
 }
@@ -156,7 +156,7 @@ function getPointsString(points?: { x: number, y: number }[]) {
 
 function isRecording(entity: any) {
     const state = props.entityStates[entity.entityId];
-    return entity.type === 'camera' && state?.cameraState === 'recording';
+    return entity.type === 'camera' && state?.state === 'recording';
 }
 
 </script>
@@ -183,7 +183,7 @@ function isRecording(entity: any) {
                     </defs>
                     <polygon v-for="entity in props.config.entities" :key="'poly-' + entity.id"
                         :points="getPointsString(entity.points)"
-                        :fill="props.entityStates[entity.entityId]?.isOn ? `url(#grad-${entity.id})` : 'transparent'"
+                        :fill="props.entityStates[entity.entityId]?.shouldLightUp ? `url(#grad-${entity.id})` : 'transparent'"
                         stroke="none" style="pointer-events: none; transition: fill-opacity 0.3s ease;" />
                 </svg>
 
@@ -206,21 +206,4 @@ function isRecording(entity: any) {
 
 <style scoped>
 /* Styles moved to parent component to ensure Shadow DOM injection in CE mode */
-
-/* Blinking animation for camera recording state */
-@keyframes camera-recording-blink {
-
-    0%,
-    100% {
-        opacity: 1;
-    }
-
-    50% {
-        opacity: 0.3;
-    }
-}
-
-.camera-recording {
-    animation: camera-recording-blink 2s ease-in-out infinite;
-}
 </style>
