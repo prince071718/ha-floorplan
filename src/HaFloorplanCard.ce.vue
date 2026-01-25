@@ -78,12 +78,8 @@ const entityStates = computed(() => {
 function handleEntityClick(entityId: string, type: string) {
     if (!props.hass) return;
 
-    if (type === 'light') {
-        props.hass.callService('light', 'toggle', {
-            entity_id: entityId
-        });
-    } else if (type === 'media_player') {
-        props.hass.callService('media_player', 'toggle', {
+    if (['light', 'switch', 'media_player'].includes(type)) {
+        props.hass.callService(type, 'toggle', {
             entity_id: entityId
         });
     } else if (type === 'camera') {
